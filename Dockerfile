@@ -2,18 +2,18 @@ FROM node:16.20-alpine3.18 as base
 RUN npm i -g pnpm
 
 FROM base as build
-WORKDIR /root/app
-COPY package.json .
+# 设置工作目录
+WORKDIR /usr/src/app
 
-#RUN ["pnpm", "install", "--registry", "https://registry.npm.taobao.org"]
-RUN ["pnpm", "install"]
-RUN ["pnpm", "execute batch-create 10"]
+# 复制依赖文件并安装依赖
+COPY package*.json ./
+RUN pnpm install
 
+# 复制应用程序代码
 COPY . .
-RUN pnpm run build
 
-#
-FROM nginx:stable
+# 暴露应用程序监听的端口
+EXPOSE 80
 
-ADD ./deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /root/app/dist /usr/share/nginx/html
+# 定义容器启动时的命令
+CMD ["pnpm", "start"]

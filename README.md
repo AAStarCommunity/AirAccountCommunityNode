@@ -68,8 +68,8 @@ $ pnpm run test:cov
 $ pnpm execute batch-create {count}
 
 ex
-```
-pnpm execute batch-create 2
+```bash
+pnpm execute batch-create 10
 ```
 ## Support
 
