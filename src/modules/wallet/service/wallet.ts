@@ -62,9 +62,9 @@ export class WalletService {
             privateKey: hdNode.privateKey,
           },
           {
-            chainId: 11155111,
+            chainId: Number(process.env.CHAIN_ID) || 11155111,
             projectKey: '',
-            rpcProviderUrl: 'https://sepolia-bundler.etherspot.io/',
+            rpcProviderUrl: process.env.CHAIN_PROVIDER || 'https://sepolia-bundler.etherspot.io/',
           },
         );
         const address: string = await primeSdk.getCounterFactualAddress();
@@ -350,9 +350,9 @@ export class WalletService {
         privateKey: privateKey,
       },
       {
-        chainId: 11155111,
+        chainId: Number(process.env.CHAIN_ID) || 11155111,
         projectKey: '',
-        rpcProviderUrl: 'https://sepolia-bundler.etherspot.io/',
+        rpcProviderUrl: process.env.CHAIN_PROVIDER || 'https://sepolia-bundler.etherspot.io/',
       },
     );
 
