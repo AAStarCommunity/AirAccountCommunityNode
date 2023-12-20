@@ -3,6 +3,7 @@ import { Controller, Get, Post, Res, Body, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { WalletService } from '../service';
 import { RequestModel } from './request.model';
+import {Wallet} from "../../../entities/wallect.entity";
 @ApiTags('Wallet')
 @Controller('wallet')
 export class WalletController {
@@ -71,18 +72,20 @@ export class WalletController {
       .json({ message: result.message, data: result.data });
   }
 
-  @Get('/wallet/batch')
+  @Get('/batch-create')
   public async CreateWallet(
-      @Query() sz: string,
+      @Query("sz") sz:string,
       @Res() res: Response
   ):Promise<undefined>{
     let status = 200
     const num = Number(sz)
     if (num > 0 && num < 50){
-      await this.service.batchCreate(Number(sz));
+      await this.service.batchCreate(num);
     } else {
       status = 400
     }
-    res.status(status)
+
+    const emptyAddr = await this.service.getEmptyAddress()
+    res.status(status).json({data: emptyAddr})
   }
 }
