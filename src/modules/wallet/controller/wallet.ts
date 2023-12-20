@@ -70,4 +70,19 @@ export class WalletController {
       .status(result.status)
       .json({ message: result.message, data: result.data });
   }
+
+  @Get('/wallet/batch')
+  public async CreateWallet(
+      @Query() sz: string,
+      @Res() res: Response
+  ):Promise<undefined>{
+    let status = 200
+    const num = Number(sz)
+    if (num > 0 && num < 50){
+      await this.service.batchCreate(Number(sz));
+    } else {
+      status = 400
+    }
+    res.status(status)
+  }
 }

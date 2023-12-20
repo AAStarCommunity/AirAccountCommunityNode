@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { WalletService } from './modules/wallet/service/wallet';
+import { WalletService } from './modules/wallet';
 
 async function bootstrap() {
   const application = await NestFactory.createApplicationContext(AppModule);
