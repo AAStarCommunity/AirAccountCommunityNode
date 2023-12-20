@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
-import { Wallet } from '../../../entities/wallect.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {IsNull, Repository} from 'typeorm';
+import {Wallet} from '../../../entities/wallect.entity';
 import {PrimeSdk} from '@etherspot/prime-sdk';
-import { ethers } from 'ethers';
+import {ethers} from 'ethers';
 
 interface Response {
   status: number;
@@ -152,7 +152,7 @@ export class WalletService {
       },
     });
 
-    return FindWallet ? true : false;
+    return !!FindWallet;
   }
   async clearBind(certificate: string): Promise<Response> {
     const FindWallet: Wallet = await this.walletRepository.findOne({
@@ -343,23 +343,20 @@ export class WalletService {
     }
 
     // Create AA Wallet with HD Wallet
-    const primeSdk = new PrimeSdk(
-      {
-        privateKey: privateKey,
-      },
-      {
-        chainId: Number(process.env.CHAIN_ID) || 11155111,
-        projectKey: '',
-        rpcProviderUrl: process.env.CHAIN_PROVIDER || 'https://sepolia-bundler.etherspot.io/',
-      },
+    return new PrimeSdk(
+        {
+          privateKey: privateKey,
+        },
+        {
+          chainId: Number(process.env.CHAIN_ID) || 11155111,
+          projectKey: '',
+          rpcProviderUrl: process.env.CHAIN_PROVIDER || 'https://sepolia-bundler.etherspot.io/',
+        },
     );
-
-    return primeSdk;
   }
   async getBalance(certificate: string): Promise<Response | undefined> {
     try {
       const primeSdk = await this._createPrimeSdk(certificate);
-      const address = await primeSdk.getCounterFactualAddress();
       const balance = await primeSdk.getNativeBalance();
 
       console.log('balances: ', balance);
