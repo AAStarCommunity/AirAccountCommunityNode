@@ -14,7 +14,7 @@ import * as process from "process";
       envFilePath: [`.env.${process.env.NODE_ENV}`, `.env`],
     }),
     TypeOrmModule.forRoot({
-      ssl: true,
+      ssl: process.env.PG_SSL == 'true',
       type: 'postgres',
       username: process.env.PG_USR,
       host: process.env.PG_URL,
