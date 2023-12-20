@@ -2,10 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { Wallet } from '../../../entities/wallect.entity';
-import {PrimeSdk, WalletConnectWalletProvider} from '@etherspot/prime-sdk';
+import {PrimeSdk} from '@etherspot/prime-sdk';
 import { ethers } from 'ethers';
-import {response} from "express";
-import * as stream from "stream";
 
 interface Response {
   status: number;
