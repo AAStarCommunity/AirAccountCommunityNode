@@ -376,10 +376,8 @@ export class WalletService {
   }
 
   async getEmptyAddress(): Promise<number>{
-    return await this.walletRepository.count({
-      where:{
-        "certificate": null
-      }
-    })
+    return await this.walletRepository.countBy({
+      "certificate": IsNull()
+    })    
   }
 }
