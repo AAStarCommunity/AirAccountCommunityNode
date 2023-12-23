@@ -22,6 +22,7 @@ export class WalletController {
   // }
   @Post('/bind')
   public async bind(@Body() dto: RequestModel, @Res() res: Response) {
+    console.log(`[POST] /bind: ${JSON.stringify(dto)}`)
     const result = await this.service.bind(dto.certificate);
     res
       .status(result.status)
@@ -29,6 +30,7 @@ export class WalletController {
   }
   @Get('/check')
   public async check(@Query() certificate: string, @Res() res: Response) {
+    console.log(`[GET] /check: ${JSON.stringify(certificate)}`)
     const result = await this.service.check(certificate);
     res
       .status(result.status)
@@ -46,6 +48,7 @@ export class WalletController {
     @Body() dto: RequestModel,
     @Res() res: Response,
   ): Promise<undefined> {
+    console.log(`[POST] /transfer: ${JSON.stringify(dto)}`)
     const result = await this.service.transfer(dto.from, dto.to, dto.value);
     res
       .status(result.status)
@@ -56,6 +59,7 @@ export class WalletController {
     @Query() op: string,
     @Res() res: Response,
   ): Promise<undefined> {
+    console.log(`[GET] /checkOp: ${JSON.stringify(op)}`)
     const result = await this.service.checkOp(op);
     res
       .status(result.status)
@@ -66,6 +70,7 @@ export class WalletController {
     @Query() certificate: string,
     @Res() res: Response,
   ): Promise<undefined> {
+    console.log(`[GET] /getBalance: ${JSON.stringify(certificate)}`)
     const result = await this.service.getBalance(certificate);
     res
       .status(result.status)
@@ -77,6 +82,7 @@ export class WalletController {
       @Query("sz") sz:string,
       @Res() res: Response
   ):Promise<undefined>{
+    console.log(`[GET] /batch-create: ${JSON.stringify(sz)}`)
     let status = 200
     const num = Number(sz)
     if (num > 0 && num < 50){
