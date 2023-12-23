@@ -12,9 +12,9 @@ export class WalletController {
   public async create(): Promise<string> {
     return this.service.create();
   }
-  @Get('/test')
-  public async test(): Promise<string> {
-    return '123';
+  @Get('/healthz')
+  public async healthz(): Promise<string> {
+    return 'ok';
   }
   // @Get('/batchCreate')
   // public async batchCreate(): Promise<string> {
@@ -86,6 +86,8 @@ export class WalletController {
     }
 
     const emptyAddr = await this.service.getEmptyAddress()
+    console.log(`total available address: ${emptyAddr}`)
+    
     res.status(status).json({data: emptyAddr})
   }
 }
