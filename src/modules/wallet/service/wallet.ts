@@ -102,10 +102,11 @@ export class WalletService {
             data: null,
           };
         } else {
-          await this.walletRepository.update(
+          const rlt = await this.walletRepository.update(
             { id: FindWallet.id },
             { certificate: certificate },
           );
+          console.log(rlt)
         }
 
         return {
