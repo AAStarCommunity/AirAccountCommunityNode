@@ -335,17 +335,18 @@ export class WalletService {
   console.log('transactions: ', userOpsBatch);
 
   // get decimals from erc20 contract
-      const balance = await erc20Instance.balanceOf(address);
-      const balance2 = ethers.formatUnits(balance, 18);
-      console.log('balances3333: ', balance2);
-    // balance > value
-    if (balance2 < value) {
+    const balance = await erc20Instance.balanceOf(address);
+    const balance2 = ethers.formatUnits(balance, 18);
+    console.log('balacne: '+balance2 + ' value: ' + value);
+    if (parseFloat(balance2) < parseFloat(value)) {
+      console.log('balance is not enough');
       return {
         status: 400,
         message: 'balance is not enough',
         data: null,
       };
     }
+    
     // estimate transactions added to the batch and get the fee data for the UserOp
     const op = await primeSdk.estimate();
 
