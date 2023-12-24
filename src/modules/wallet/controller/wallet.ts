@@ -72,6 +72,7 @@ export class WalletController {
   ): Promise<undefined> {
     console.log(`[GET] /getBalance: ${JSON.stringify(certificate)}`)
     const result = await this.service.getBalance(certificate);
+    console.log(`[GET] /getBalance: ${JSON.stringify(result)}`);
     res
       .status(result.status)
       .json({ message: result.message, data: result.data });

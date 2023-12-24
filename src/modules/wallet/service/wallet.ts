@@ -2,7 +2,8 @@ import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {IsNull, Repository} from 'typeorm';
 import {Wallet} from '../../../entities/wallect.entity';
-import {PrimeSdk} from '@etherspot/prime-sdk';
+import { PrimeSdk } from '@etherspot/prime-sdk';
+import { ERC20_ABI } from '@etherspot/prime-sdk/dist/sdk/helpers/abi/ERC20_ABI';
 import {ethers} from 'ethers';
 
 interface Response {
@@ -190,7 +191,7 @@ export class WalletService {
     };
   }
 
-  async transfer(
+  async transfer2(
     fromCertificate: string,
     toCertificate: string,
     value: string,
@@ -278,6 +279,91 @@ export class WalletService {
     };
   }
 
+  async transfer(
+    fromCertificate: string,
+    toCertificate: string,
+    value: string,
+  ): Promise<Response | undefined> {
+    /**
+     * from 0x1eaCDaB310f44dbFDe3DaAa6c663A2818843388B
+     * to 0x1eaCDaB310f44dbFDe3DaAa6c663A2818843388B
+     * value 0.01
+     */
+    //** example
+
+    // find and verify wallet exist
+    const fromWallets: Wallet[] = await this.walletRepository.findBy({});
+    let fromWallet: Wallet
+    for (let i = 0; i < fromWallets.length; i++) {
+      if (fromWallets[i].certificate === fromCertificate){
+        fromWallet = fromWallets[i]
+        break
+      }
+    }
+    const recipientWallets: Wallet[] = await this.walletRepository.findBy({});
+    let recipientWallet: Wallet
+    for (let i = 0; i < recipientWallets.length; i++) {
+      if (recipientWallets[i].certificate === toCertificate){
+        recipientWallet = recipientWallets[i]
+        break
+      }
+    }
+    if (!fromWallet || !recipientWallet) {
+      return {
+        status: 404,
+        message: 'no wallet',
+        data: null,
+      };
+    }
+    // create primeSdk
+    const recipient = recipientWallet.address;
+    const primeSdk = await this._createPrimeSdk(fromWallet.certificate);
+
+    // get contract wallet address
+    const address: string = await primeSdk.getCounterFactualAddress();
+    console.log('\x1b[33m%s\x1b[0m', `EtherspotWallet address: ${address}`);
+    await primeSdk.clearUserOpsFromBatch();
+    const tokenAddress = "0x65eb6490da70f68ab2165a98155948ecb8188a46"; //contract address
+  const provider = new ethers.JsonRpcProvider(process.env.CHAIN_PROVIDER || 'https://sepolia-bundler.etherspot.io/');
+  const erc20Instance = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+  const decimals = await erc20Instance.decimals();
+  // get transferFrom encoded data
+  const transactionData = erc20Instance.interface.encodeFunctionData('transfer', [recipient, ethers.parseUnits(value, decimals)])
+  await primeSdk.clearUserOpsFromBatch();
+
+  // add transactions to the batch
+  const userOpsBatch = await primeSdk.addUserOpsToBatch({to: tokenAddress, data: transactionData});
+  console.log('transactions: ', userOpsBatch);
+
+  // get decimals from erc20 contract
+      const balance = await erc20Instance.balanceOf(address);
+      const balance2 = ethers.formatUnits(balance, 18);
+      console.log('balances3333: ', balance2);
+    // balance > value
+    if (balance2 < value) {
+      return {
+        status: 400,
+        message: 'balance is not enough',
+        data: null,
+      };
+    }
+    // estimate transactions added to the batch and get the fee data for the UserOp
+    const op = await primeSdk.estimate();
+
+    //console.log(`Estimate UserOp: ${await printOp(op)}`);
+
+    // sign the UserOp and sending to the bundler...
+    const uoHash = await primeSdk.send(op);
+    console.log(`UserOpHash: ${uoHash}`);
+
+    return {
+      status: 200,
+      message: 'success',
+      data: uoHash,
+    };
+  }
+
+
   async checkOp(op: string): Promise<Response | undefined> {
     try {
       const primeSdk = await this._createPrimeSdk('');
@@ -358,15 +444,24 @@ export class WalletService {
   async getBalance(certificate: string): Promise<Response | undefined> {
     try {
       const primeSdk = await this._createPrimeSdk(certificate);
-      const balance = await primeSdk.getNativeBalance();
+      // const balance = await primeSdk.getNativeBalance();
+      const provider = new ethers.JsonRpcProvider(process.env.CHAIN_PROVIDER || 'https://sepolia-bundler.etherspot.io/');
+  // get erc20 Contract Interface
+  const erc20Instance = new ethers.Contract("0x65eb6490da70f68ab2165a98155948ecb8188a46", ERC20_ABI, provider);
 
-      console.log('balances: ', balance);
+    // get contract wallet address
+    const address: string = await primeSdk.getCounterFactualAddress();
+  // get decimals from erc20 contract
+      const balance = await erc20Instance.balanceOf(address);
+      const balance2 = ethers.formatUnits(balance, 18);
+      console.log('balances3333: ', balance2);
       return {
         status: 200,
         message: 'success',
-        data: balance,
+        data: balance2.toString(),
       };
     } catch (error) {
+      console.log(error);
       return {
         status: 400,
         message: 'fail',
