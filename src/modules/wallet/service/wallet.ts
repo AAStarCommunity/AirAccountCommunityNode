@@ -253,10 +253,9 @@ export class WalletService {
     //get balance of the account address
     const balance = await primeSdk.getNativeBalance();
 
-    console.log('balances: ', balance);
-
-    // balance > value
-    if (balance < value) {
+    console.log('balance: ' + balance + ' value: ' + value);
+    if (parseFloat(balance) < parseFloat(value)){
+      console.log('balance is not enough, balance: ' + balance + ' value: ' + value);
       return {
         status: 400,
         message: 'balance is not enough',
