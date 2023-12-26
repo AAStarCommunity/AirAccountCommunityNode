@@ -139,7 +139,7 @@ export class WalletService {
 
     return result
       ? {
-          status: 200,
+          status: 201,
           message: "ok",
           data: null,
         }
