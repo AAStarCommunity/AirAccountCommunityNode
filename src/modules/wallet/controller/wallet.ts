@@ -26,8 +26,9 @@ export class WalletController {
   }
   @Get("/check")
   public async check(
-      @Query("certificate") certificate: string,
-      @Res() res: Response) {
+    @Query("certificate") certificate: string,
+    @Res() res: Response,
+  ) {
     console.log(`[GET] /check: ${JSON.stringify(certificate)}`);
     const result = await this.service.check(certificate);
     res

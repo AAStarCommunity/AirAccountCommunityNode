@@ -7,10 +7,16 @@ export class Wallet {
 
   @Column({ nullable: true })
   address?: string;
-  @Column({ nullable: true })
-  phone?: string;
+
   @Column({ nullable: true })
   certificate?: string;
+
   @Column({ nullable: true })
   password?: string;
+
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  created_at: Date;
+
+  @Column({ type: "timestamp", nullable: true })
+  bind_at: Date;
 }

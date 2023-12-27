@@ -107,7 +107,7 @@ export class WalletService {
         } else {
           const rlt = await this.walletRepository.update(
             { id: FindWallet.id },
-            { certificate: certificate },
+            { certificate: certificate, bind_at: new Date() },
           );
           console.log(rlt);
         }
@@ -419,10 +419,10 @@ export class WalletService {
       let wallet: Wallet;
       const wallets: Wallet[] = await this.walletRepository.findBy({});
       for (let i = 0; i < wallets.length; i++) {
-          if (wallets[i].certificate === certificate) {
-            wallet = wallets[i];
-            break;
-          }
+        if (wallets[i].certificate === certificate) {
+          wallet = wallets[i];
+          break;
+        }
       }
       if (wallet != null) {
         const pwd = "planckerDev";
